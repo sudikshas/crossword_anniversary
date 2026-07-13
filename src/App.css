@@ -75,6 +75,17 @@
   color: var(--color-text-soft);
 }
 
+.puzzle-screen {
+  align-items: flex-start;
+  padding-top: 28px;
+}
+
+.puzzle-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
 @media (min-width: 480px) {
   .card {
     padding: 48px 36px;

@@ -1,8 +1,15 @@
+import { useMemo } from 'react'
+import puzzleData from '../data/puzzle_data.json'
+import { buildGrid } from '../utils/buildGrid'
+import CrosswordGrid from '../components/CrosswordGrid'
+
 function PuzzleScreen() {
+  const grid = useMemo(() => buildGrid(puzzleData), [])
+
   return (
     <div className="screen puzzle-screen">
-      <div className="card">
-        <p className="placeholder-text">Crossword coming next</p>
+      <div className="puzzle-container">
+        <CrosswordGrid grid={grid} />
       </div>
     </div>
   )
