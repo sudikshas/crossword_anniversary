@@ -1,0 +1,47 @@
+.clue-card {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-card-bg);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -8px 24px -12px rgba(143, 63, 84, 0.25);
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+}
+
+.clue-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.clue-card-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.clue-card-direction {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-accent-dark);
+}
+
+.clue-card-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text);
+  text-align: left;
+}

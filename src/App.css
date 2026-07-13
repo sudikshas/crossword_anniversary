@@ -78,6 +78,7 @@
 .puzzle-screen {
   align-items: flex-start;
   padding-top: 28px;
+  padding-bottom: 110px;
 }
 
 .puzzle-container {

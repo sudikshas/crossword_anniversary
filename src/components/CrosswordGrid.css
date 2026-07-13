@@ -8,16 +8,37 @@
 .grid-cell {
   position: relative;
   aspect-ratio: 1 / 1;
-}
-
-.grid-cell:not(.grid-cell--empty) {
-  background: #ffffff;
-  border: 1px solid var(--color-accent-dark);
-  border-radius: 2px;
+  padding: 0;
+  margin: 0;
 }
 
 .grid-cell--empty {
   background: transparent;
+  border: none;
+}
+
+button.grid-cell {
+  background: #ffffff;
+  border: 1px solid var(--color-accent-dark);
+  border-radius: 2px;
+  cursor: pointer;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button.grid-cell:focus-visible {
+  outline: 2px solid var(--color-accent-dark);
+  outline-offset: 1px;
+}
+
+.grid-cell--active-word {
+  background: var(--color-word-highlight);
+  border-color: var(--color-accent);
+}
+
+.grid-cell--selected {
+  background: var(--color-selected);
+  border-color: var(--color-selected);
 }
 
 .grid-cell-number {
@@ -28,4 +49,8 @@
   line-height: 1;
   font-weight: 600;
   color: var(--color-accent-dark);
+}
+
+.grid-cell--selected .grid-cell-number {
+  color: #ffffff;
 }
