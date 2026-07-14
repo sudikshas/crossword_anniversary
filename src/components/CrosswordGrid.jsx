@@ -1,7 +1,13 @@
 import './CrosswordGrid.css'
 import { cellKey } from '../utils/wordIndex'
 
-function CrosswordGrid({ grid, selectedCell, activeWordCellKeys, onCellTap }) {
+function CrosswordGrid({
+  grid,
+  selectedCell,
+  activeWordCellKeys,
+  cellEntries,
+  onCellTap,
+}) {
   const colCount = grid[0]?.length ?? 0
 
   return (
@@ -22,10 +28,14 @@ function CrosswordGrid({ grid, selectedCell, activeWordCellKeys, onCellTap }) {
           const isSelected =
             selectedCell?.row === rowIndex && selectedCell?.col === colIndex
           const isActiveWord = activeWordCellKeys.has(key)
+          const entry = cellEntries[key]
 
           const classNames = ['grid-cell']
           if (isActiveWord) classNames.push('grid-cell--active-word')
           if (isSelected) classNames.push('grid-cell--selected')
+          if (entry?.status === 'incorrect') {
+            classNames.push('grid-cell--incorrect')
+          }
 
           return (
             <button
@@ -36,6 +46,12 @@ function CrosswordGrid({ grid, selectedCell, activeWordCellKeys, onCellTap }) {
             >
               {cell.number != null && (
                 <span className="grid-cell-number">{cell.number}</span>
+              )}
+              {entry?.letter && (
+                <span className="grid-cell-letter">{entry.letter}</span>
+              )}
+              {entry?.status === 'incorrect' && (
+                <span className="grid-cell-incorrect-mark">✕</span>
               )}
             </button>
           )

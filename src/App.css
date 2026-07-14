@@ -87,6 +87,18 @@
   margin: 0 auto;
 }
 
+.crossword-input-capture {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  font-size: 16px;
+}
+
 @media (min-width: 480px) {
   .card {
     padding: 48px 36px;

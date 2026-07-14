@@ -8,6 +8,7 @@
   --color-border: #f0dfe2;
   --color-selected: #4caf50;
   --color-word-highlight: #f7dde3;
+  --color-incorrect: #d32f2f;
   --shadow-card: 0 20px 40px -20px rgba(143, 63, 84, 0.25);
 
   --font-heading: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;

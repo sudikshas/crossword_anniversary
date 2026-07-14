@@ -26,3 +26,15 @@ export function buildCellIndex(words) {
 
   return index
 }
+
+export function buildLetterMap(words) {
+  const map = new Map()
+
+  words.forEach((word) => {
+    getWordCells(word).forEach(({ row, col }, i) => {
+      map.set(cellKey(row, col), word.answer[i].toUpperCase())
+    })
+  })
+
+  return map
+}
