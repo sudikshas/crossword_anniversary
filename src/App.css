@@ -81,6 +81,17 @@
   padding-bottom: 110px;
 }
 
+.puzzle-progress {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 16px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--color-accent-dark);
+}
+
 .puzzle-container {
   width: 100%;
   max-width: 480px;

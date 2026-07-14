@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import confetti from 'canvas-confetti'
 import puzzleData from '../data/puzzle_data.json'
 import { buildGrid } from '../utils/buildGrid'
 import {
@@ -10,7 +11,9 @@ import {
 import CrosswordGrid from '../components/CrosswordGrid'
 import ClueCard from '../components/ClueCard'
 
-function PuzzleScreen() {
+const TOTAL_WORDS = puzzleData.length
+
+function PuzzleScreen({ onComplete }) {
   const grid = useMemo(() => buildGrid(puzzleData), [])
   const cellIndex = useMemo(() => buildCellIndex(puzzleData), [])
   const letterMap = useMemo(() => buildLetterMap(puzzleData), [])
@@ -18,6 +21,8 @@ function PuzzleScreen() {
 
   const [selection, setSelection] = useState(null)
   const [cellEntries, setCellEntries] = useState({})
+
+  const hasCompletedRef = useRef(false)
 
   const activeWord = selection
     ? cellIndex.get(cellKey(selection.row, selection.col))?.[selection.direction]
@@ -32,6 +37,30 @@ function PuzzleScreen() {
     () => new Set(activeWordCells.map(({ row, col }) => cellKey(row, col))),
     [activeWordCells]
   )
+
+  const solvedWordIds = useMemo(() => {
+    const solved = new Set()
+    puzzleData.forEach((word, index) => {
+      const isSolved = getWordCells(word).every(
+        ({ row, col }) => cellEntries[cellKey(row, col)]?.status === 'correct'
+      )
+      if (isSolved) solved.add(index)
+    })
+    return solved
+  }, [cellEntries])
+
+  useEffect(() => {
+    if (hasCompletedRef.current || solvedWordIds.size !== TOTAL_WORDS) return
+
+    hasCompletedRef.current = true
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
+
+    const timeoutId = setTimeout(() => {
+      onComplete?.()
+    }, 1500)
+
+    return () => clearTimeout(timeoutId)
+  }, [solvedWordIds, onComplete])
 
   const handleCellTap = (row, col) => {
     const wordsAtCell = cellIndex.get(cellKey(row, col))
@@ -114,6 +143,9 @@ function PuzzleScreen() {
 
   return (
     <div className="screen puzzle-screen">
+      <div className="puzzle-progress">
+        {solvedWordIds.size} / {TOTAL_WORDS} memories solved
+      </div>
       <div className="puzzle-container">
         <CrosswordGrid
           grid={grid}

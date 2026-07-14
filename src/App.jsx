@@ -18,7 +18,9 @@ function App() {
       {screen === SCREEN.WELCOME && (
         <WelcomeScreen onBegin={() => setScreen(SCREEN.PUZZLE)} />
       )}
-      {screen === SCREEN.PUZZLE && <PuzzleScreen />}
+      {screen === SCREEN.PUZZLE && (
+        <PuzzleScreen onComplete={() => setScreen(SCREEN.COMPLETION)} />
+      )}
       {screen === SCREEN.COMPLETION && <CompletionScreen />}
     </div>
   )
