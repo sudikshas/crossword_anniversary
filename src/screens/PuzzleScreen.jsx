@@ -17,7 +17,7 @@ function PuzzleScreen({ onComplete }) {
   const grid = useMemo(() => buildGrid(puzzleData), [])
   const cellIndex = useMemo(() => buildCellIndex(puzzleData), [])
   const letterMap = useMemo(() => buildLetterMap(puzzleData), [])
-  const inputRef = useRef(null)
+  const inputRefs = useRef(new Map())
 
   const [selection, setSelection] = useState(null)
   const [cellEntries, setCellEntries] = useState({})
@@ -62,7 +62,19 @@ function PuzzleScreen({ onComplete }) {
     return () => clearTimeout(timeoutId)
   }, [solvedWordIds, onComplete])
 
-  const handleCellTap = (row, col) => {
+  const registerInputRef = (key, element) => {
+    if (element) {
+      inputRefs.current.set(key, element)
+    } else {
+      inputRefs.current.delete(key)
+    }
+  }
+
+  const focusCell = (row, col) => {
+    inputRefs.current.get(cellKey(row, col))?.focus()
+  }
+
+  const handleCellSelect = (row, col) => {
     const wordsAtCell = cellIndex.get(cellKey(row, col))
     if (!wordsAtCell) return
 
@@ -79,19 +91,29 @@ function PuzzleScreen({ onComplete }) {
     } else if (!isSameCell) {
       setSelection({ row, col, direction: hasAcross ? 'across' : 'down' })
     }
-
-    inputRef.current?.focus()
   }
 
   const moveSelectionTo = (cell) => {
     if (!cell || !selection) return
     setSelection({ ...selection, row: cell.row, col: cell.col })
+    focusCell(cell.row, cell.col)
   }
 
-  const handleLetterInput = (rawChar) => {
-    if (!selection) return
-    const letter = rawChar.toUpperCase()
-    const key = cellKey(selection.row, selection.col)
+  const handleLetterInput = (row, col, rawValue) => {
+    const letter = rawValue.slice(-1).toUpperCase()
+    const key = cellKey(row, col)
+
+    if (!letter) {
+      setCellEntries((prev) => {
+        const next = { ...prev }
+        delete next[key]
+        return next
+      })
+      return
+    }
+
+    if (!/^[A-Z]$/.test(letter)) return
+
     const isCorrect = letterMap.get(key) === letter
 
     setCellEntries((prev) => ({
@@ -102,72 +124,32 @@ function PuzzleScreen({ onComplete }) {
     if (!isCorrect) return
 
     const currentIndex = activeWordCells.findIndex(
-      (c) => c.row === selection.row && c.col === selection.col
+      (c) => c.row === row && c.col === col
     )
     moveSelectionTo(activeWordCells[currentIndex + 1])
   }
 
-  const handleBackspace = () => {
-    if (!selection) return
-    const key = cellKey(selection.row, selection.col)
-
-    if (cellEntries[key]?.letter) {
-      setCellEntries((prev) => {
-        const next = { ...prev }
-        delete next[key]
-        return next
-      })
-      return
-    }
-
+  const handleBackspaceOnEmpty = (row, col) => {
     const currentIndex = activeWordCells.findIndex(
-      (c) => c.row === selection.row && c.col === selection.col
+      (c) => c.row === row && c.col === col
     )
     moveSelectionTo(activeWordCells[currentIndex - 1])
   }
 
-  const handleKeyDown = (event) => {
-    if (event.key === 'Backspace') {
-      event.preventDefault()
-      handleBackspace()
-    }
-  }
-
-  const handleChange = (event) => {
-    const typedChar = event.target.value.slice(-1)
-    event.target.value = ''
-    if (/^[a-zA-Z]$/.test(typedChar)) {
-      handleLetterInput(typedChar)
-    }
-  }
-
   return (
     <div className="screen puzzle-screen">
-      <div className="puzzle-progress">
-        {solvedWordIds.size} / {TOTAL_WORDS} memories solved
-      </div>
       <div className="puzzle-container">
         <CrosswordGrid
           grid={grid}
           selectedCell={selection}
           activeWordCellKeys={activeWordCellKeys}
           cellEntries={cellEntries}
-          onCellTap={handleCellTap}
+          onCellSelect={handleCellSelect}
+          onLetterInput={handleLetterInput}
+          onBackspaceOnEmpty={handleBackspaceOnEmpty}
+          registerInputRef={registerInputRef}
         />
       </div>
-      <input
-        ref={inputRef}
-        className="crossword-input-capture"
-        type="text"
-        inputMode="text"
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="characters"
-        spellCheck="false"
-        aria-label="Crossword letter input"
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
       {activeWord && (
         <ClueCard word={activeWord} direction={selection.direction} />
       )}

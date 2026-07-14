@@ -81,33 +81,10 @@
   padding-bottom: 110px;
 }
 
-.puzzle-progress {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto 16px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: var(--color-accent-dark);
-}
-
 .puzzle-container {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-}
-
-.crossword-input-capture {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  border: none;
-  opacity: 0;
-  font-size: 16px;
 }
 
 @media (min-width: 480px) {

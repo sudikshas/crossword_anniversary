@@ -8,8 +8,6 @@
 .grid-cell {
   position: relative;
   aspect-ratio: 1 / 1;
-  padding: 0;
-  margin: 0;
 }
 
 .grid-cell--empty {
@@ -17,28 +15,20 @@
   border: none;
 }
 
-button.grid-cell {
+.grid-cell:not(.grid-cell--empty) {
   background: #ffffff;
   border: 1px solid var(--color-accent-dark);
   border-radius: 2px;
-  cursor: pointer;
-  font: inherit;
-  -webkit-tap-highlight-color: transparent;
-}
-
-button.grid-cell:focus-visible {
-  outline: 2px solid var(--color-accent-dark);
-  outline-offset: 1px;
 }
 
 .grid-cell--active-word {
   background: var(--color-word-highlight);
-  border-color: var(--color-accent);
+  border: 2.5px solid var(--color-accent);
 }
 
 .grid-cell--selected {
   background: var(--color-selected);
-  border-color: var(--color-selected);
+  border: 2.5px solid var(--color-accent);
 }
 
 .grid-cell-number {
@@ -50,29 +40,30 @@ button.grid-cell:focus-visible {
   font-weight: 600;
   color: var(--color-accent-dark);
   z-index: 1;
+  pointer-events: none;
 }
 
-.grid-cell--selected .grid-cell-number {
-  color: #ffffff;
-}
-
-.grid-cell-letter {
+.grid-cell-input {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0;
+  background: transparent;
+  outline: none;
+  text-align: center;
+  font: inherit;
   font-size: 0.65rem;
   font-weight: 700;
   color: var(--color-accent-dark);
   text-transform: uppercase;
+  caret-color: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.grid-cell--selected .grid-cell-letter {
-  color: #ffffff;
-}
-
-.grid-cell--incorrect .grid-cell-letter {
+.grid-cell--incorrect .grid-cell-input {
   color: var(--color-incorrect);
 }
 
@@ -85,4 +76,5 @@ button.grid-cell:focus-visible {
   font-weight: 700;
   color: var(--color-incorrect);
   z-index: 1;
+  pointer-events: none;
 }

@@ -6,7 +6,10 @@ function CrosswordGrid({
   selectedCell,
   activeWordCellKeys,
   cellEntries,
-  onCellTap,
+  onCellSelect,
+  onLetterInput,
+  onBackspaceOnEmpty,
+  registerInputRef,
 }) {
   const colCount = grid[0]?.length ?? 0
 
@@ -20,9 +23,7 @@ function CrosswordGrid({
           const key = cellKey(rowIndex, colIndex)
 
           if (!cell.playable) {
-            return (
-              <div key={key} className="grid-cell grid-cell--empty" />
-            )
+            return <div key={key} className="grid-cell grid-cell--empty" />
           }
 
           const isSelected =
@@ -38,22 +39,38 @@ function CrosswordGrid({
           }
 
           return (
-            <button
-              type="button"
-              key={key}
-              className={classNames.join(' ')}
-              onClick={() => onCellTap(rowIndex, colIndex)}
-            >
+            <div key={key} className={classNames.join(' ')}>
               {cell.number != null && (
                 <span className="grid-cell-number">{cell.number}</span>
               )}
-              {entry?.letter && (
-                <span className="grid-cell-letter">{entry.letter}</span>
-              )}
+              <input
+                ref={(el) => registerInputRef(key, el)}
+                className="grid-cell-input"
+                type="text"
+                inputMode="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                aria-label={`Crossword cell row ${rowIndex + 1}, column ${colIndex + 1}`}
+                value={entry?.letter ?? ''}
+                onClick={() => onCellSelect(rowIndex, colIndex)}
+                onFocus={(event) => event.target.select()}
+                onChange={(event) => {
+                  onLetterInput(rowIndex, colIndex, event.target.value)
+                  event.target.select()
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Backspace' && !entry?.letter) {
+                    event.preventDefault()
+                    onBackspaceOnEmpty(rowIndex, colIndex)
+                  }
+                }}
+              />
               {entry?.status === 'incorrect' && (
                 <span className="grid-cell-incorrect-mark">✕</span>
               )}
-            </button>
+            </div>
           )
         })
       )}
