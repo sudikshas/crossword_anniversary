@@ -21,13 +21,18 @@
   border-radius: 3px;
 }
 
-.grid-cell--active-word {
+/* Chaining `.grid-cell` with the modifier (instead of just the modifier
+   class alone) matches the specificity of `.grid-cell:not(.grid-cell--empty)`
+   above - :not() counts its argument's specificity too, so a lone
+   `.grid-cell--active-word` selector was previously losing to the base
+   rule's background and never actually showing. */
+.grid-cell.grid-cell--active-word {
   background: var(--color-word-highlight-elegant);
-  border: 2px solid var(--color-sage);
+  border: 2px solid var(--color-sage-dark);
   z-index: 1;
 }
 
-.grid-cell--selected {
+.grid-cell.grid-cell--selected {
   background: var(--color-selected-elegant);
   border: 2px solid var(--color-teal-dark);
   box-shadow: 0 0 0 1.5px var(--color-teal-dark);

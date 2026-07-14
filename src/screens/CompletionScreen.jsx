@@ -47,7 +47,7 @@ function CompletionScreen() {
     <div className="screen completion-screen">
       <div className="completion-content">
         <span className="welcome-ornament" aria-hidden="true" />
-        <h1 className="completion-title">You finished the puzzle ❤️</h1>
+        <h1 className="completion-title">You finished the puzzle! ❤️</h1>
         <p className="completion-message">
           Congrats on solving our 3-year anniversary crossword! I loved
           looking back at all these memories with you, and I’m so excited to

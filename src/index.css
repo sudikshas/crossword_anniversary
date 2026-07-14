@@ -27,7 +27,7 @@
   /* Puzzle screen - same elegant palette, tuned for grid legibility. */
   --color-cell-border: #cfdccb;
   --color-cell-text: var(--color-teal-dark);
-  --color-word-highlight-elegant: #eef4ec;
+  --color-word-highlight-elegant: #d6e8d1;
   --color-selected-elegant: #b9d6b2;
   --color-incorrect-elegant: #b5543f;
 
