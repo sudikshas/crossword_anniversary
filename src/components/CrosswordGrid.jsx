@@ -58,7 +58,6 @@ function CrosswordGrid({
                 onFocus={(event) => event.target.select()}
                 onChange={(event) => {
                   onLetterInput(rowIndex, colIndex, event.target.value)
-                  event.target.select()
                 }}
                 onKeyDown={(event) => {
                   if (event.key === 'Backspace' && !entry?.letter) {
