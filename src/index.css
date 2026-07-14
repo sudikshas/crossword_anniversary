@@ -11,9 +11,32 @@
   --color-incorrect: #d32f2f;
   --shadow-card: 0 20px 40px -20px rgba(143, 63, 84, 0.25);
 
+  /* Elegant/romantic palette - scoped to the welcome screen only, so the
+     crossword grid keeps its existing rose accent colors untouched. */
+  --color-ivory: #faf6ee;
+  --color-ivory-deep: #f3ecdd;
+  --color-sage: #8fa889;
+  --color-sage-dark: #5f7a5a;
+  --color-teal: #4f7c78;
+  --color-teal-dark: #375955;
+  --color-welcome-text: #3c3733;
+  --color-welcome-text-soft: #756d66;
+  --shadow-welcome-card: 0 24px 48px -24px rgba(55, 89, 85, 0.18),
+    0 8px 20px -12px rgba(95, 122, 90, 0.12);
+
+  /* Puzzle screen - same elegant palette, tuned for grid legibility. */
+  --color-cell-border: #cfdccb;
+  --color-cell-text: var(--color-teal-dark);
+  --color-word-highlight-elegant: #eef4ec;
+  --color-selected-elegant: #b9d6b2;
+  --color-incorrect-elegant: #b5543f;
+
   --font-heading: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-heading-elegant: 'Cormorant Garamond', Georgia, serif;
   --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     sans-serif;
+  --font-body-modern: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
 
   color-scheme: light;
   font-family: var(--font-body);

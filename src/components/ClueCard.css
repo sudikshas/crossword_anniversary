@@ -3,11 +3,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--color-card-bg);
-  border-top: 1px solid var(--color-border);
-  box-shadow: 0 -8px 24px -12px rgba(143, 63, 84, 0.25);
+  background: #ffffff;
+  border-top: 1px solid rgba(143, 168, 137, 0.22);
+  box-shadow: 0 -12px 28px -16px rgba(55, 89, 85, 0.22);
   padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
+  font-family: var(--font-body-modern);
 }
 
 .clue-card-header {
@@ -25,7 +26,7 @@
   height: 22px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-sage-dark) 100%);
   color: #ffffff;
   font-size: 13px;
   font-weight: 700;
@@ -36,13 +37,13 @@
   font-weight: 600;
   letter-spacing: 0.4px;
   text-transform: uppercase;
-  color: var(--color-accent-dark);
+  color: var(--color-teal-dark);
 }
 
 .clue-card-text {
   font-size: 15px;
   line-height: 1.5;
-  color: var(--color-text);
+  color: var(--color-welcome-text);
   text-align: left;
 }
 
@@ -53,7 +54,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--color-accent);
+  color: var(--color-teal);
   font-size: 14px;
   font-weight: 600;
   text-decoration: underline;
@@ -61,6 +62,6 @@
 }
 
 .clue-card-hint-link:focus-visible {
-  outline: 2px solid var(--color-accent-dark);
+  outline: 2px solid var(--color-teal-dark);
   outline-offset: 3px;
 }

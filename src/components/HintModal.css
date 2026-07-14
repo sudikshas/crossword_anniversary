@@ -39,7 +39,7 @@
   border: none;
   border-radius: 50%;
   background: #ffffff;
-  color: var(--color-accent-dark);
+  color: var(--color-teal-dark);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -47,6 +47,6 @@
 }
 
 .hint-modal-close:focus-visible {
-  outline: 2px solid var(--color-accent-dark);
+  outline: 2px solid var(--color-teal-dark);
   outline-offset: 2px;
 }

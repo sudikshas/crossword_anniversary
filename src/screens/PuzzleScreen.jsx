@@ -49,18 +49,48 @@ function PuzzleScreen({ onComplete }) {
     return solved
   }, [cellEntries])
 
+  const solvedCount = solvedWordIds.size
+
   useEffect(() => {
-    if (hasCompletedRef.current || solvedWordIds.size !== TOTAL_WORDS) return
+    // Depending on `solvedCount` (a primitive) rather than `solvedWordIds`
+    // (a new Set instance every render) matters here: once the puzzle is
+    // complete, any further re-render would otherwise still be seen as a
+    // "changed" dependency, re-running this effect's cleanup and cancelling
+    // the pending onComplete() timeout before it ever fires.
+    if (hasCompletedRef.current || solvedCount !== TOTAL_WORDS) return
 
     hasCompletedRef.current = true
-    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
+
+    const rainDurationMs = 5000
+    const rainEndAt = Date.now() + rainDurationMs
+
+    // Fire small bursts from random points just above the top of the
+    // viewport on a steady interval so confetti keeps "raining" down for
+    // the full duration, rather than a single burst.
+    const rainInterval = setInterval(() => {
+      confetti({
+        particleCount: 30,
+        startVelocity: 25,
+        spread: 100,
+        ticks: 220,
+        gravity: 0.8,
+        origin: { x: Math.random(), y: -0.1 },
+      })
+
+      if (Date.now() >= rainEndAt) {
+        clearInterval(rainInterval)
+      }
+    }, 220)
 
     const timeoutId = setTimeout(() => {
       onComplete?.()
-    }, 1500)
+    }, rainDurationMs)
 
-    return () => clearTimeout(timeoutId)
-  }, [solvedWordIds, onComplete])
+    return () => {
+      clearInterval(rainInterval)
+      clearTimeout(timeoutId)
+    }
+  }, [solvedCount, onComplete])
 
   const registerInputRef = (key, element) => {
     if (element) {

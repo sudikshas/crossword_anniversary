@@ -17,20 +17,20 @@
 
 .grid-cell:not(.grid-cell--empty) {
   background: #ffffff;
-  border: 1px solid var(--color-accent-dark);
-  border-radius: 2px;
+  border: 1px solid var(--color-cell-border);
+  border-radius: 3px;
 }
 
 .grid-cell--active-word {
-  background: var(--color-word-highlight);
-  border: 2px solid var(--color-accent);
+  background: var(--color-word-highlight-elegant);
+  border: 2px solid var(--color-sage);
   z-index: 1;
 }
 
 .grid-cell--selected {
-  background: var(--color-selected);
-  border: 2px solid var(--color-accent-dark);
-  box-shadow: 0 0 0 1.5px var(--color-accent-dark);
+  background: var(--color-selected-elegant);
+  border: 2px solid var(--color-teal-dark);
+  box-shadow: 0 0 0 1.5px var(--color-teal-dark);
   z-index: 2;
 }
 
@@ -41,7 +41,7 @@
   font-size: 0.5rem;
   line-height: 1;
   font-weight: 600;
-  color: var(--color-accent-dark);
+  color: var(--color-cell-text);
   z-index: 1;
   pointer-events: none;
 }
@@ -59,7 +59,7 @@
   font: inherit;
   font-size: 0.65rem;
   font-weight: 700;
-  color: var(--color-accent-dark);
+  color: var(--color-cell-text);
   text-transform: uppercase;
   caret-color: transparent;
   cursor: pointer;
@@ -67,7 +67,7 @@
 }
 
 .grid-cell--incorrect .grid-cell-input {
-  color: var(--color-incorrect);
+  color: var(--color-incorrect-elegant);
 }
 
 .grid-cell-incorrect-mark {
@@ -77,7 +77,7 @@
   font-size: 0.5rem;
   line-height: 1;
   font-weight: 700;
-  color: var(--color-incorrect);
+  color: var(--color-incorrect-elegant);
   z-index: 1;
   pointer-events: none;
 }

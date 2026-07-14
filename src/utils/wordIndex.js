@@ -38,3 +38,21 @@ export function buildLetterMap(words) {
 
   return map
 }
+
+// Builds a cellEntries-shaped map with every cell already filled in
+// correctly, for read-only review of a finished puzzle (no solving state
+// needed - the answers are the source of truth).
+export function buildSolvedEntries(words) {
+  const entries = {}
+
+  words.forEach((word) => {
+    getWordCells(word).forEach(({ row, col }, i) => {
+      entries[cellKey(row, col)] = {
+        letter: word.answer[i].toUpperCase(),
+        status: 'correct',
+      }
+    })
+  })
+
+  return entries
+}
