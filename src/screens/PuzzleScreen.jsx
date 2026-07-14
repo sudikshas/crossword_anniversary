@@ -70,8 +70,16 @@ function PuzzleScreen({ onComplete }) {
     }
   }
 
+  // Deferring the focus call to the next animation frame avoids a subtle
+  // race where calling .focus() synchronously inside the event that changed
+  // React state could get fought over by the browser before the state
+  // update finishes committing. It's purely cosmetic (keeps the visible
+  // "cursor" input and the mobile keyboard in sync with the active cell) -
+  // the actual letter routing below never depends on focus succeeding.
   const focusCell = (row, col) => {
-    inputRefs.current.get(cellKey(row, col))?.focus()
+    const element = inputRefs.current.get(cellKey(row, col))
+    if (!element) return
+    requestAnimationFrame(() => element.focus())
   }
 
   const handleCellSelect = (row, col) => {
@@ -99,21 +107,11 @@ function PuzzleScreen({ onComplete }) {
     focusCell(cell.row, cell.col)
   }
 
-  const handleLetterInput = (row, col, rawValue) => {
-    const letter = rawValue.slice(-1).toUpperCase()
-    const key = cellKey(row, col)
-
-    if (!letter) {
-      setCellEntries((prev) => {
-        const next = { ...prev }
-        delete next[key]
-        return next
-      })
-      return
-    }
-
+  const handleLetterInput = (row, col, rawChar) => {
+    const letter = rawChar.slice(-1).toUpperCase()
     if (!/^[A-Z]$/.test(letter)) return
 
+    const key = cellKey(row, col)
     const isCorrect = letterMap.get(key) === letter
 
     setCellEntries((prev) => ({
@@ -129,11 +127,41 @@ function PuzzleScreen({ onComplete }) {
     moveSelectionTo(activeWordCells[currentIndex + 1])
   }
 
-  const handleBackspaceOnEmpty = (row, col) => {
+  const handleBackspaceAtCell = (row, col) => {
+    const key = cellKey(row, col)
+
+    if (cellEntries[key]?.letter) {
+      setCellEntries((prev) => {
+        const next = { ...prev }
+        delete next[key]
+        return next
+      })
+      return
+    }
+
     const currentIndex = activeWordCells.findIndex(
       (c) => c.row === row && c.col === col
     )
     moveSelectionTo(activeWordCells[currentIndex - 1])
+  }
+
+  // All keystrokes bubble up here from whichever per-cell input is
+  // currently focused. We deliberately ignore event.target and always act
+  // on our own `selection` state instead - this is what makes typing
+  // reliable regardless of any mobile-browser focus timing quirks.
+  const handleGridKeyDown = (event) => {
+    if (!selection) return
+
+    if (event.key === 'Backspace') {
+      event.preventDefault()
+      handleBackspaceAtCell(selection.row, selection.col)
+      return
+    }
+
+    if (/^[a-zA-Z]$/.test(event.key)) {
+      event.preventDefault()
+      handleLetterInput(selection.row, selection.col, event.key)
+    }
   }
 
   return (
@@ -145,8 +173,7 @@ function PuzzleScreen({ onComplete }) {
           activeWordCellKeys={activeWordCellKeys}
           cellEntries={cellEntries}
           onCellSelect={handleCellSelect}
-          onLetterInput={handleLetterInput}
-          onBackspaceOnEmpty={handleBackspaceOnEmpty}
+          onGridKeyDown={handleGridKeyDown}
           registerInputRef={registerInputRef}
         />
       </div>

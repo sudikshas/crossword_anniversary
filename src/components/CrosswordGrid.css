@@ -23,12 +23,15 @@
 
 .grid-cell--active-word {
   background: var(--color-word-highlight);
-  border: 2.5px solid var(--color-accent);
+  border: 2px solid var(--color-accent);
+  z-index: 1;
 }
 
 .grid-cell--selected {
   background: var(--color-selected);
-  border: 2.5px solid var(--color-accent);
+  border: 2px solid var(--color-accent-dark);
+  box-shadow: 0 0 0 1.5px var(--color-accent-dark);
+  z-index: 2;
 }
 
 .grid-cell-number {

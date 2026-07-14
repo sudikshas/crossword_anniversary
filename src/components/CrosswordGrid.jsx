@@ -7,8 +7,7 @@ function CrosswordGrid({
   activeWordCellKeys,
   cellEntries,
   onCellSelect,
-  onLetterInput,
-  onBackspaceOnEmpty,
+  onGridKeyDown,
   registerInputRef,
 }) {
   const colCount = grid[0]?.length ?? 0
@@ -17,6 +16,7 @@ function CrosswordGrid({
     <div
       className="crossword-grid"
       style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+      onKeyDown={onGridKeyDown}
     >
       {grid.map((rowCells, rowIndex) =>
         rowCells.map((cell, colIndex) => {
@@ -55,15 +55,14 @@ function CrosswordGrid({
                 aria-label={`Crossword cell row ${rowIndex + 1}, column ${colIndex + 1}`}
                 value={entry?.letter ?? ''}
                 onClick={() => onCellSelect(rowIndex, colIndex)}
-                onFocus={(event) => event.target.select()}
                 onChange={(event) => {
-                  onLetterInput(rowIndex, colIndex, event.target.value)
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === 'Backspace' && !entry?.letter) {
-                    event.preventDefault()
-                    onBackspaceOnEmpty(rowIndex, colIndex)
-                  }
+                  // Letters/backspace are handled by the grid-level key
+                  // handler using our own selection state, which is far more
+                  // reliable across mobile keyboards than trusting whichever
+                  // input the browser currently has focused. If a keystroke
+                  // ever slips past preventDefault, snap the DOM back to the
+                  // canonical value instead of letting it drift out of sync.
+                  event.target.value = entry?.letter ?? ''
                 }}
               />
               {entry?.status === 'incorrect' && (
