@@ -16,7 +16,7 @@
     "col": 4,
     "direction": "down",
     "clueNumber": 2,
-    "hintImage": "/images/azure_photo.png",
+    "hintImage": "/images/azure_photo.jpg",
     "memoryImage": null
   },
   {
@@ -116,7 +116,7 @@
     "col": 0,
     "direction": "down",
     "clueNumber": 11,
-    "hintImage": "/images/philly_photo.png",
+    "hintImage": "/images/philly_photo.jpg",
     "memoryImage": null
   },
   {

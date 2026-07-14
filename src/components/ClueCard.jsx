@@ -1,6 +1,12 @@
+import { useState } from 'react'
 import './ClueCard.css'
+import HintModal from './HintModal'
+import { getHintImagePath } from '../utils/hintImage'
 
 function ClueCard({ word, direction }) {
+  const [showHint, setShowHint] = useState(false)
+  const hintImageSrc = getHintImagePath(word.hintImage)
+
   return (
     <div className="clue-card">
       <div className="clue-card-header">
@@ -10,6 +16,22 @@ function ClueCard({ word, direction }) {
         </span>
       </div>
       <p className="clue-card-text">{word.clue}</p>
+      {hintImageSrc && (
+        <button
+          type="button"
+          className="clue-card-hint-link"
+          onClick={() => setShowHint(true)}
+        >
+          View picture hint
+        </button>
+      )}
+      {showHint && (
+        <HintModal
+          src={hintImageSrc}
+          alt="Picture hint"
+          onClose={() => setShowHint(false)}
+        />
+      )}
     </div>
   )
 }
