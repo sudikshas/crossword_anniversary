@@ -367,37 +367,27 @@
   outline-offset: 3px;
 }
 
-/* Read-only puzzle review - grid cells still render as real inputs (to
+/* Read-only puzzle review - grid cells are still real `<button>`s (to
    reuse CrosswordGrid as-is), but interaction is disabled since there's
    nothing to solve here. */
-.puzzle-container--review .grid-cell-input {
+.puzzle-container--review .grid-cell {
   pointer-events: none;
 }
 
 .puzzle-screen {
-  /* Height is set inline from PuzzleScreen.jsx to the *visual* viewport's
-     real height (via the Visual Viewport API), which - unlike `100dvh`
-     or `100vh` - actually shrinks by exactly the amount the iOS on-screen
-     keyboard covers. Everything below has to fit inside that height, so
-     the grid and the clue card are guaranteed to always both fit above
-     the keyboard, stacked with no overlap, instead of the clue card
-     needing to float over/under either of them. This value is just a
-     fallback for the instant before that JS measurement lands. */
+  /* A plain, static height - there's no native keyboard to ever resize
+     around anymore (the custom keyboard below is a normal, fixed part of
+     this same flex column), so this never needs to change at runtime.
+     `100dvh` already excludes mobile browser chrome; `100vh` is just the
+     pre-`dvh`-support fallback. */
+  height: 100vh;
   height: 100dvh;
   overflow: hidden;
   align-items: stretch;
   /* `.screen` defaults to `flex-direction: row` - override to `column` so
-     the grid and the clue card stack vertically instead of sitting side
-     by side. */
+     the header, grid+hint, and keyboard stack vertically. */
   flex-direction: column;
-  padding-top: 14px;
-  /* Tighter side padding than the default `.screen` padding (24px) - an
-     18x18 grid needs every extra pixel of width it can get on a small
-     phone, and the puzzle card doesn't need as much breathing room as the
-     welcome/completion cards do. */
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  padding: 0;
   background: radial-gradient(
     circle at 50% -10%,
     var(--color-ivory-deep) 0%,
@@ -405,22 +395,43 @@
   );
 }
 
-.puzzle-container {
-  /* Takes up whatever vertical space is left over once the (fixed-size)
-     clue card below has taken its own share of the screen's fixed
-     height - `min-height: 0` is what allows this to actually shrink
-     below its content's natural size instead of overflowing. PuzzleScreen
-     measures this element's real, resulting content-box size (via
-     ResizeObserver) and computes an exact pixel cell size from it, which
-     is what actually makes the grid "zoom out" to fit - centering it here
-     is purely cosmetic once that real size is known. */
+.puzzle-header {
+  flex: 0 0 auto;
+  padding: 10px 14px 6px;
+}
+
+.puzzle-progress-track {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(143, 168, 137, 0.2);
+  overflow: hidden;
+}
+
+.puzzle-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-teal) 0%, var(--color-sage-dark) 100%);
+  /* A calm, non-bouncy fill - eases towards its new width instead of
+     snapping, without ever moving/resizing anything else on screen. */
+  transition: width 0.25s ease;
+}
+
+/* Everything between the header and the keyboard - lets the grid+hint
+   pair scroll as a last resort on very short screens, without the
+   header or keyboard ever moving. */
+.puzzle-scroll-area {
   flex: 1 1 auto;
   min-height: 0;
-  min-width: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  padding: 4px 8px;
+}
+
+.puzzle-container {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
@@ -428,17 +439,12 @@
   border: 1px solid rgba(143, 168, 137, 0.18);
   border-radius: 20px;
   box-shadow: var(--shadow-welcome-card);
-  padding: 10px;
+  padding: 6px;
 }
 
 @media (min-width: 480px) {
-  .puzzle-screen {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
   .puzzle-container {
-    padding: 16px;
+    padding: 12px;
   }
 }
 

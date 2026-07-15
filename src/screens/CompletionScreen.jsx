@@ -34,8 +34,6 @@ function CompletionScreen() {
               activeWordCellKeys={EMPTY_SET}
               cellEntries={solvedEntries}
               onCellSelect={noop}
-              onGridKeyDown={noop}
-              registerInputRef={noop}
             />
           </div>
         </div>

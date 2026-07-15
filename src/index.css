@@ -31,6 +31,10 @@
   --color-selected-elegant: #b9d6b2;
   --color-incorrect-elegant: #b5543f;
 
+  /* Custom on-screen keyboard tray. */
+  --color-keyboard-tray: #eef1ec;
+  --color-keyboard-key-alt: #e2e8de;
+
   --font-heading: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
   --font-heading-elegant: 'Cormorant Garamond', Georgia, serif;
   --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
