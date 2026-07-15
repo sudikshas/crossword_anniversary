@@ -64,10 +64,7 @@ function PuzzleScreen({ onComplete }) {
     const rainDurationMs = 5000
     const rainEndAt = Date.now() + rainDurationMs
 
-    // Fire small bursts from random points just above the top of the
-    // viewport on a steady interval so confetti keeps "raining" down for
-    // the full duration, rather than a single burst.
-    const rainInterval = setInterval(() => {
+    const fireBurst = () => {
       confetti({
         particleCount: 30,
         startVelocity: 25,
@@ -76,6 +73,18 @@ function PuzzleScreen({ onComplete }) {
         gravity: 0.8,
         origin: { x: Math.random(), y: -0.1 },
       })
+    }
+
+    // Fire the first burst immediately - setInterval alone would otherwise
+    // wait a full tick before the very first piece of confetti appears,
+    // making the celebration feel delayed right after the last letter.
+    fireBurst()
+
+    // Continue firing small bursts from random points just above the top
+    // of the viewport on a steady interval so confetti keeps "raining"
+    // down for the full duration, rather than a single burst.
+    const rainInterval = setInterval(() => {
+      fireBurst()
 
       if (Date.now() >= rainEndAt) {
         clearInterval(rainInterval)
