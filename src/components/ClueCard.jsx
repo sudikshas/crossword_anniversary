@@ -3,12 +3,12 @@ import './ClueCard.css'
 import HintModal from './HintModal'
 import { getHintImagePath } from '../utils/hintImage'
 
-function ClueCard({ word, direction }) {
+function ClueCard({ word, direction, cardRef }) {
   const [showHint, setShowHint] = useState(false)
   const hintImageSrc = getHintImagePath(word.hintImage)
 
   return (
-    <div className="clue-card">
+    <div className="clue-card" ref={cardRef}>
       <div className="clue-card-header">
         <span className="clue-card-number">{word.clueNumber}</span>
         <span className="clue-card-direction">

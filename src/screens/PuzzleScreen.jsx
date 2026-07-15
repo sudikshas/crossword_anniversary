@@ -21,8 +21,10 @@ function PuzzleScreen({ onComplete }) {
 
   const [selection, setSelection] = useState(null)
   const [cellEntries, setCellEntries] = useState({})
+  const [clueCardHeight, setClueCardHeight] = useState(0)
 
   const hasCompletedRef = useRef(false)
+  const clueCardRef = useRef(null)
 
   const activeWord = selection
     ? cellIndex.get(cellKey(selection.row, selection.col))?.[selection.direction]
@@ -37,6 +39,26 @@ function PuzzleScreen({ onComplete }) {
     () => new Set(activeWordCells.map(({ row, col }) => cellKey(row, col))),
     [activeWordCells]
   )
+
+  // The clue card is pinned to the bottom of the screen and its height
+  // varies with clue text length, so the grid's bottom padding is kept in
+  // sync with its real measured height (rather than a fixed worst-case
+  // value) to avoid either overlapping the grid or leaving a big empty gap
+  // below it for short clues.
+  useEffect(() => {
+    const element = clueCardRef.current
+    if (!element) {
+      setClueCardHeight(0)
+      return
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0]?.contentRect.height
+      if (height != null) setClueCardHeight(height)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [activeWord])
 
   const solvedWordIds = useMemo(() => {
     const solved = new Set()
@@ -203,8 +225,21 @@ function PuzzleScreen({ onComplete }) {
     }
   }
 
+  // Falls back to the CSS class's own (safely oversized) default until the
+  // clue card's real height has actually been measured, so there's never a
+  // frame where the reserved space is too small and the card overlaps the
+  // grid - it just briefly reserves more space than strictly necessary.
+  const reservedBottomSpace = !activeWord
+    ? undefined
+    : clueCardHeight
+      ? `${clueCardHeight + 24}px`
+      : undefined
+
   return (
-    <div className="screen puzzle-screen">
+    <div
+      className="screen puzzle-screen"
+      style={reservedBottomSpace ? { paddingBottom: reservedBottomSpace } : undefined}
+    >
       <div className="puzzle-container">
         <CrosswordGrid
           grid={grid}
@@ -217,7 +252,11 @@ function PuzzleScreen({ onComplete }) {
         />
       </div>
       {activeWord && (
-        <ClueCard word={activeWord} direction={selection.direction} />
+        <ClueCard
+          word={activeWord}
+          direction={selection.direction}
+          cardRef={clueCardRef}
+        />
       )}
     </div>
   )

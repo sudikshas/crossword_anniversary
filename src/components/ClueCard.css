@@ -9,6 +9,13 @@
   padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
   font-family: var(--font-body-modern);
+  /* Capped so even the longest clue text can never grow tall enough to
+     cover the bottom row of the grid above it - `.puzzle-screen`'s
+     padding-bottom is sized to match this cap. Any clue that would
+     otherwise overflow just scrolls internally instead. */
+  max-height: 150px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .clue-card-header {
@@ -50,8 +57,10 @@
 .clue-card-hint-link {
   display: inline-flex;
   align-items: center;
-  margin-top: 8px;
-  padding: 0;
+  /* Padding (offset by a matching negative margin) enlarges the tap
+     target well past the visible text without shifting the layout. */
+  margin: 4px 0 -10px -4px;
+  padding: 10px 4px;
   border: none;
   background: none;
   color: var(--color-teal);

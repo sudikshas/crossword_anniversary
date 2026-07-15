@@ -12,6 +12,24 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
+  animation: screen-fade-in 0.32s ease both;
+}
+
+@keyframes screen-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    animation: none;
+  }
 }
 
 .card {
@@ -105,12 +123,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   background: #ffffff;
   border: 1px solid rgba(143, 168, 137, 0.18);
   border-radius: 28px;
   box-shadow: var(--shadow-welcome-card);
-  padding: 48px 32px;
+  padding: 36px 24px;
   text-align: center;
 }
 
@@ -179,6 +197,7 @@
 @media (min-width: 480px) {
   .welcome-card {
     padding: 56px 40px;
+    gap: 22px;
   }
 
   .welcome-card-title {
@@ -318,7 +337,8 @@
 .completion-back-button {
   align-self: flex-start;
   margin-left: 8px;
-  padding: 10px 20px;
+  padding: 13px 22px;
+  min-height: 44px;
   border: 1px solid rgba(79, 124, 120, 0.3);
   border-radius: 999px;
   background: #ffffff;
@@ -353,8 +373,17 @@
 
 .puzzle-screen {
   align-items: flex-start;
-  padding-top: 28px;
-  padding-bottom: 110px;
+  padding-top: 20px;
+  /* The clue card is capped at 150px tall (see .clue-card) so this reserved
+     space is guaranteed to always be enough to avoid it ever covering the
+     bottom row of the grid, on any screen size. */
+  padding-bottom: 170px;
+  /* Tighter side padding than the default `.screen` padding (24px) - an
+     18x18 grid needs every extra pixel of width it can get on a small
+     phone, and the puzzle card doesn't need as much breathing room as the
+     welcome/completion cards do. */
+  padding-left: 10px;
+  padding-right: 10px;
   background: radial-gradient(
     circle at 50% -10%,
     var(--color-ivory-deep) 0%,
@@ -368,9 +397,20 @@
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid rgba(143, 168, 137, 0.18);
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: var(--shadow-welcome-card);
-  padding: 16px;
+  padding: 10px;
+}
+
+@media (min-width: 480px) {
+  .puzzle-screen {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .puzzle-container {
+    padding: 16px;
+  }
 }
 
 @media (min-width: 480px) {
