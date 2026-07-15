@@ -375,28 +375,29 @@
 }
 
 .puzzle-screen {
-  /* Normal document flow, scrolled by the page itself (not a nested
-     overflow container) - this is what lets the browser's native
-     "scroll the focused input into view" behavior and our own
-     scrollIntoView calls both work against one single, predictable
-     scroll position. */
-  align-items: flex-start;
+  /* Height is set inline from PuzzleScreen.jsx to the *visual* viewport's
+     real height (via the Visual Viewport API), which - unlike `100dvh`
+     or `100vh` - actually shrinks by exactly the amount the iOS on-screen
+     keyboard covers. Everything below has to fit inside that height, so
+     the grid and the clue card are guaranteed to always both fit above
+     the keyboard, stacked with no overlap, instead of the clue card
+     needing to float over/under either of them. This value is just a
+     fallback for the instant before that JS measurement lands. */
+  height: 100dvh;
+  overflow: hidden;
+  align-items: stretch;
   /* `.screen` defaults to `flex-direction: row` - override to `column` so
-     the grid and the (now normally in-flow) clue card stack vertically
-     instead of sitting side by side. */
+     the grid and the clue card stack vertically instead of sitting side
+     by side. */
   flex-direction: column;
-  padding-top: 20px;
+  padding-top: 14px;
   /* Tighter side padding than the default `.screen` padding (24px) - an
      18x18 grid needs every extra pixel of width it can get on a small
      phone, and the puzzle card doesn't need as much breathing room as the
      welcome/completion cards do. */
   padding-left: 10px;
   padding-right: 10px;
-  /* padding-bottom is set dynamically inline from PuzzleScreen.jsx - it
-     has to match the clue card's real (measured) height *plus* however
-     much of the screen the on-screen keyboard is currently covering, so
-     there's always enough room to scroll the grid's last row above both
-     the card and the keyboard. */
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
   background: radial-gradient(
     circle at 50% -10%,
     var(--color-ivory-deep) 0%,
@@ -405,6 +406,21 @@
 }
 
 .puzzle-container {
+  /* Takes up whatever vertical space is left over once the (fixed-size)
+     clue card below has taken its own share of the screen's fixed
+     height - `min-height: 0` is what allows this to actually shrink
+     below its content's natural size instead of overflowing. PuzzleScreen
+     measures this element's real, resulting content-box size (via
+     ResizeObserver) and computes an exact pixel cell size from it, which
+     is what actually makes the grid "zoom out" to fit - centering it here
+     is purely cosmetic once that real size is known. */
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   width: 100%;
   max-width: 480px;
   margin: 0 auto;

@@ -1,9 +1,11 @@
 .clue-card {
-  /* Default: normal document flow, sitting naturally right below the
-     grid. No keyboard is open in this state, so there's no need to pin
-     it anywhere - doing so would leave a dead gap between the grid and
-     the card whenever the grid is shorter than the screen. */
-  position: static;
+  /* Always normal document flow, sitting right below the grid inside the
+     fixed-height `.puzzle-screen` flex column - never floating or fixed.
+     Since `.puzzle-container` above it is `flex: 1 1 auto; min-height: 0`,
+     this card always gets its full natural height first and the grid
+     fits itself into whatever's left, so the two can never overlap and
+     the card is never covered by the keyboard. */
+  flex: 0 0 auto;
   width: 100%;
   max-width: 480px;
   margin: 14px auto 0;
@@ -15,29 +17,11 @@
   z-index: 10;
   font-family: var(--font-body-modern);
   /* Capped so a very long clue can never eat so much of the (possibly
-     keyboard-shrunk) viewport that the grid above becomes unusably small -
+     keyboard-shrunk) screen that the grid above becomes unusably small -
      it scrolls internally instead once it hits this limit. */
-  max-height: 42vh;
+  max-height: 38vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-/* Only applied while the on-screen keyboard is actually open (see
-   `isKeyboardOpen` in PuzzleScreen.jsx, driven by the Visual Viewport
-   API) - detaches the card from the page flow and pins it just above
-   the keyboard instead, since it would otherwise end up covered by it. */
-.clue-card--floating {
-  position: fixed;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  /* Real value set inline via JS (`style={{ bottom }}`) once the exact
-     keyboard height is known - this default just keeps things sane for
-     the very first paint before that measurement lands. */
-  bottom: 0;
-  /* Smooths out the card's position catching up as the keyboard
-     animates open/closed, instead of it snapping abruptly. */
-  transition: bottom 0.15s ease-out;
 }
 
 .clue-card-header {

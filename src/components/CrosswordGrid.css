@@ -5,6 +5,17 @@
   background: transparent;
 }
 
+/* When PuzzleScreen measures real available space and passes an exact
+   `cellSize` (see CrosswordGrid.jsx), the grid's own row/column tracks
+   are already set to that exact pixel size inline - so it must NOT also
+   stretch to `width: 100%` here, or that would fight the deliberately
+   "zoomed out" (possibly much narrower than its container) size that was
+   just computed to fit above the clue card. */
+.crossword-grid--fitted {
+  width: max-content;
+  margin: 0 auto;
+}
+
 .grid-cell {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -45,13 +56,22 @@
   left: 2px;
   /* Scales with viewport width (which tracks cell size, since the grid is
      always the same column count) so numbers stay legible on wider phones
-     instead of staying pinned to a tiny fixed size. */
+     instead of staying pinned to a tiny fixed size. Overridden below for
+     the "fitted" grid, which knows its cell size exactly. */
   font-size: clamp(5.5px, 1.7vw, 9px);
   line-height: 1;
   font-weight: 600;
   color: var(--color-cell-text);
   z-index: 1;
   pointer-events: none;
+}
+
+.crossword-grid--fitted .grid-cell-number {
+  /* Set inline from PuzzleScreen.jsx based on the real, measured cell
+     size, rather than guessed from viewport width - this is what keeps
+     numbers legible (and not oversized) regardless of how much the grid
+     has "zoomed out" to fit above the clue card/keyboard. */
+  font-size: var(--number-font-size, 8px);
 }
 
 .grid-cell-input {
@@ -65,34 +85,28 @@
   outline: none;
   text-align: center;
   font: inherit;
-  /* iOS Safari auto-zooms the whole page when a focused input's
-     computed font-size is under 16px - which our cells, being much
-     smaller than that, would otherwise always be. Keeping this at a
-     fixed 16px (never smaller) stops that zoom outright. The visible
-     glyph is then scaled back down below to actually fit the tiny cell -
-     `transform` is purely a paint-time effect, so Safari's zoom check
-     (which looks at the underlying font-size, not the rendered size)
-     isn't fooled by it. */
-  font-size: 16px;
+  font-size: clamp(10px, 3.1vw, 16px);
   font-weight: 700;
   color: var(--color-cell-text);
   text-transform: uppercase;
   caret-color: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transform: scale(0.62);
 }
 
-@media (min-width: 360px) {
-  .grid-cell-input {
-    transform: scale(0.72);
-  }
-}
-
-@media (min-width: 415px) {
-  .grid-cell-input {
-    transform: scale(0.83);
-  }
+.crossword-grid--fitted .grid-cell-input {
+  /* iOS Safari auto-zooms the whole page when a focused input's
+     computed font-size is under 16px - which our cells, being much
+     smaller than that, would otherwise always be. Keeping this at a
+     fixed 16px (never smaller) stops that zoom outright. The visible
+     glyph is then scaled back down via `transform` to actually fit the
+     cell - `transform` is purely a paint-time effect, so Safari's zoom
+     check (which looks at the underlying font-size, not the rendered
+     size) isn't fooled by it. `--input-font-scale` is computed in
+     CrosswordGrid.jsx from the same real, measured cell size as the
+     clue number above. */
+  font-size: 16px;
+  transform: scale(var(--input-font-scale, 0.6));
 }
 
 .grid-cell--incorrect .grid-cell-input {
@@ -109,4 +123,8 @@
   color: var(--color-incorrect-elegant);
   z-index: 1;
   pointer-events: none;
+}
+
+.crossword-grid--fitted .grid-cell-incorrect-mark {
+  font-size: var(--number-font-size, 8px);
 }

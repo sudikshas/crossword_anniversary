@@ -8,7 +8,7 @@ import {
   cellKey,
   getWordCells,
 } from '../utils/wordIndex'
-import { useKeyboardInset } from '../utils/useKeyboardInset'
+import { useVisualViewportHeight } from '../utils/useVisualViewportHeight'
 import CrosswordGrid from '../components/CrosswordGrid'
 import ClueCard from '../components/ClueCard'
 
@@ -22,11 +22,49 @@ function PuzzleScreen({ onComplete }) {
 
   const [selection, setSelection] = useState(null)
   const [cellEntries, setCellEntries] = useState({})
-  const [clueCardHeight, setClueCardHeight] = useState(0)
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
   const hasCompletedRef = useRef(false)
   const clueCardRef = useRef(null)
-  const keyboardInset = useKeyboardInset()
+  const containerRef = useRef(null)
+  const viewportHeight = useVisualViewportHeight()
+
+  const rowCount = grid.length
+  const colCount = grid[0]?.length ?? 0
+
+  // `.puzzle-container`'s own content-box size already reflects exactly
+  // how much room is actually left for the grid at any moment - it's a
+  // flex sibling of the clue card inside the fixed-height `.puzzle-screen`
+  // (see below), so its size automatically shrinks whenever the clue card
+  // grows or the keyboard opens. Measuring it directly here, rather than
+  // separately tracking the clue card's height and the keyboard inset and
+  // re-deriving the leftover space by hand, means there's only ever one
+  // source of truth for "how much space is actually available."
+  useEffect(() => {
+    const element = containerRef.current
+    if (!element) return
+
+    const observer = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect
+      setContainerSize({ width, height })
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  const cellSize = useMemo(() => {
+    if (containerSize.width <= 0 || containerSize.height <= 0) return null
+
+    const gapPx = 1.5
+    const availableWidth = containerSize.width - gapPx * (colCount - 1)
+    const availableHeight = containerSize.height - gapPx * (rowCount - 1)
+    const rawSize = Math.min(availableWidth / colCount, availableHeight / rowCount)
+
+    // Floored (not just clamped) so the grid never renders at a
+    // fractional size that could leave a stray sliver of empty space
+    // between it and the container's edge from rounding.
+    return Math.max(8, Math.floor(rawSize))
+  }, [containerSize, colCount, rowCount])
 
   const activeWord = selection
     ? cellIndex.get(cellKey(selection.row, selection.col))?.[selection.direction]
@@ -41,49 +79,6 @@ function PuzzleScreen({ onComplete }) {
     () => new Set(activeWordCells.map(({ row, col }) => cellKey(row, col))),
     [activeWordCells]
   )
-
-  // Measure the clue card's real height so the grid's reserved bottom
-  // space can match it exactly, instead of guessing a worst-case value.
-  useEffect(() => {
-    const element = clueCardRef.current
-    if (!element) {
-      setClueCardHeight(0)
-      return
-    }
-
-    const observer = new ResizeObserver((entries) => {
-      const height = entries[0]?.contentRect.height
-      if (height != null) setClueCardHeight(height)
-    })
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [activeWord])
-
-  // Whenever the selected cell changes (tap, auto-advance, or backspace
-  // navigation) - or the keyboard finishes opening/closing while a cell
-  // is already selected - bring that cell into a comfortable, visible
-  // spot. The delay lets the keyboard animation (and the resulting
-  // `keyboardInset` update) settle first, so we're scrolling against its
-  // final position rather than a mid-animation one.
-  useEffect(() => {
-    if (!selection) return
-    const cellElement = inputRefs.current.get(cellKey(selection.row, selection.col))
-    if (!cellElement) return
-
-    const timeoutId = setTimeout(() => {
-      cellElement.scrollIntoView({ block: 'center', behavior: 'smooth' })
-
-      // While the keyboard is closed, the clue card sits in normal flow
-      // right below the grid rather than floating - if the selected cell
-      // is near the top of a tall grid, centering just the cell could
-      // still leave the card below the fold. `block: 'nearest'` nudges
-      // just enough extra to bring it fully into view too, without
-      // fighting the cell's own scroll position above.
-      clueCardRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-    }, 320)
-
-    return () => clearTimeout(timeoutId)
-  }, [selection?.row, selection?.col, keyboardInset])
 
   const solvedWordIds = useMemo(() => {
     const solved = new Set()
@@ -250,29 +245,18 @@ function PuzzleScreen({ onComplete }) {
     }
   }
 
-  // A small threshold (rather than `keyboardInset > 0`) avoids the card
-  // flickering between modes from tiny, meaningless fluctuations in
-  // `visualViewport.height` (e.g. Safari's UI chrome nudging by a couple
-  // of pixels) that aren't an actual keyboard.
-  const isKeyboardOpen = keyboardInset > 40
-
-  // While the keyboard is open, the card detaches from the page and
-  // floats `keyboardInset` pixels above the true bottom of the screen so
-  // it's never covered by it. The grid's reserved bottom space then
-  // matches the card's real height plus that same inset, so scrolling to
-  // the very bottom of the page never hides the grid's last row behind
-  // the card or the keyboard. The rest of the time, the card just sits in
-  // normal flow directly below the grid, so there's no dead gap.
-  const reservedBottomSpace = activeWord && isKeyboardOpen
-    ? (clueCardHeight || 150) + keyboardInset + 24
-    : 24
-
   return (
     <div
       className="screen puzzle-screen"
-      style={{ paddingBottom: `${reservedBottomSpace}px` }}
+      // Pinned to the *visual* viewport's real height (shrinks by exactly
+      // the amount the on-screen keyboard covers). With `.puzzle-container`
+      // and the clue card stacked as flex children of this fixed-height
+      // column, the grid always resizes itself to fit whatever's left
+      // above the card - so the whole puzzle is visible "zoomed out" at a
+      // glance, and the two can never overlap or hide behind the keyboard.
+      style={{ height: `${viewportHeight}px` }}
     >
-      <div className="puzzle-container">
+      <div className="puzzle-container" ref={containerRef}>
         <CrosswordGrid
           grid={grid}
           selectedCell={selection}
@@ -281,16 +265,11 @@ function PuzzleScreen({ onComplete }) {
           onCellSelect={handleCellSelect}
           onGridKeyDown={handleGridKeyDown}
           registerInputRef={registerInputRef}
+          cellSize={cellSize}
         />
       </div>
       {activeWord && (
-        <ClueCard
-          word={activeWord}
-          direction={selection.direction}
-          cardRef={clueCardRef}
-          floating={isKeyboardOpen}
-          style={isKeyboardOpen ? { bottom: `${keyboardInset}px` } : undefined}
-        />
+        <ClueCard word={activeWord} direction={selection.direction} cardRef={clueCardRef} />
       )}
     </div>
   )

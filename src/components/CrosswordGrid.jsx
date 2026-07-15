@@ -9,13 +9,30 @@ function CrosswordGrid({
   onCellSelect,
   onGridKeyDown,
   registerInputRef,
+  cellSize,
 }) {
+  const rowCount = grid.length
   const colCount = grid[0]?.length ?? 0
+
+  // `cellSize` (an exact pixel value, measured by PuzzleScreen from the
+  // actual space left above the clue card) is what makes the grid "zoom
+  // out" to fit entirely on screen. Without it - e.g. the read-only
+  // puzzle recap on the completion screen, which has no keyboard or clue
+  // card to make room for - the grid instead just sizes itself from the
+  // available width, same as before.
+  const style = cellSize
+    ? {
+        gridTemplateColumns: `repeat(${colCount}, ${cellSize}px)`,
+        gridTemplateRows: `repeat(${rowCount}, ${cellSize}px)`,
+        '--number-font-size': `${Math.max(4.5, Math.min(9, cellSize * 0.32))}px`,
+        '--input-font-scale': Math.max(0.4, Math.min(1, (cellSize * 0.58) / 16)),
+      }
+    : { gridTemplateColumns: `repeat(${colCount}, 1fr)` }
 
   return (
     <div
-      className="crossword-grid"
-      style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+      className={cellSize ? 'crossword-grid crossword-grid--fitted' : 'crossword-grid'}
+      style={style}
       onKeyDown={onGridKeyDown}
     >
       {grid.map((rowCells, rowIndex) =>
