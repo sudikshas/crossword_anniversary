@@ -1,20 +1,30 @@
 .hint-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  /* Portaled straight into `document.body` (see HintModal.jsx), so this
+     is always sized against the true viewport - never a clipped or
+     offset ancestor box. */
+  width: 100vw;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.78);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 32px 24px;
-  z-index: 100;
+  /* Deliberately about as high as a z-index can go - guarantees this
+     sits above the crossword grid, clue card, and custom keyboard no
+     matter what stacking context any of them end up in. */
+  z-index: 2147483647;
   animation: hint-modal-fade-in 0.2s ease both;
 }
 
 .hint-modal-content {
   position: relative;
-  max-width: 100%;
-  max-height: 100%;
   display: flex;
+  /* The image itself is capped below; this just needs to be big enough
+     to contain it plus the close button that overhangs its corner. */
+  max-width: 92vw;
+  max-height: 82dvh;
   animation: hint-modal-pop-in 0.22s ease both;
 }
 
@@ -47,21 +57,24 @@
 
 .hint-modal-image {
   display: block;
-  max-width: 100%;
-  max-height: 80vh;
+  /* Exact mobile-fit requirements: the photo always stays fully within
+     the visible screen and keeps its natural proportions - never
+     stretched or cropped. */
+  max-width: 92vw;
+  max-height: 82dvh;
   width: auto;
   height: auto;
-  border-radius: 12px;
   object-fit: contain;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
 }
 
 .hint-modal-close {
   position: absolute;
   top: -14px;
   right: -14px;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,10 +82,14 @@
   border-radius: 50%;
   background: #ffffff;
   color: var(--color-teal-dark);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  /* Sits in its own layer above the image within `.hint-modal-content`,
+     always tappable regardless of where the photo itself ends. */
+  z-index: 1;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hint-modal-close:focus-visible {
