@@ -1,19 +1,30 @@
 .clue-card {
-  position: fixed;
+  /* Sticky (scoped to the `.puzzle-scroll-area` scroll container) instead
+     of `position: fixed` to the page/viewport - `fixed` elements are
+     positioned against the layout viewport, which on iOS Safari doesn't
+     shrink when the keyboard opens, so a fixed bottom-0 card can end up
+     rendered *behind* the keyboard. A sticky element inside a normal
+     scrolling container stays correctly anchored to the bottom of
+     whatever area is actually visible. */
+  position: sticky;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  margin-top: 14px;
+  flex-shrink: 0;
   background: #ffffff;
-  border-top: 1px solid rgba(143, 168, 137, 0.22);
-  box-shadow: 0 -12px 28px -16px rgba(55, 89, 85, 0.22);
-  padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  border: 1px solid rgba(143, 168, 137, 0.22);
+  border-radius: 16px;
+  box-shadow: 0 -6px 20px -10px rgba(55, 89, 85, 0.22);
+  padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
   font-family: var(--font-body-modern);
-  /* Capped so even the longest clue text can never grow tall enough to
-     cover the bottom row of the grid above it - `.puzzle-screen`'s
-     padding-bottom is sized to match this cap. Any clue that would
-     otherwise overflow just scrolls internally instead. */
-  max-height: 150px;
+  /* Capped so a very long clue can never eat so much of the (possibly
+     keyboard-shrunk) viewport that the grid above becomes unusably small -
+     it scrolls internally instead once it hits this limit. */
+  max-height: 42vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

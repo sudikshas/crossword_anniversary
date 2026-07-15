@@ -372,23 +372,42 @@
 }
 
 .puzzle-screen {
-  align-items: flex-start;
-  padding-top: 20px;
-  /* The clue card is capped at 150px tall (see .clue-card) so this reserved
-     space is guaranteed to always be enough to avoid it ever covering the
-     bottom row of the grid, on any screen size. */
-  padding-bottom: 170px;
-  /* Tighter side padding than the default `.screen` padding (24px) - an
-     18x18 grid needs every extra pixel of width it can get on a small
-     phone, and the puzzle card doesn't need as much breathing room as the
-     welcome/completion cards do. */
-  padding-left: 10px;
-  padding-right: 10px;
+  /* `100dvh` (dynamic viewport height) tracks the *visible* area and
+     shrinks when the mobile keyboard opens, unlike `100vh` which stays
+     pinned to the full screen height. Declaring `100vh` first keeps older
+     browsers that don't understand `dvh` on a sane fallback - they simply
+     ignore the later, invalid-to-them declaration. */
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  padding: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
   background: radial-gradient(
     circle at 50% -10%,
     var(--color-ivory-deep) 0%,
     var(--color-ivory) 55%
   );
+}
+
+/* The screen itself no longer scrolls - this inner area does. Keeping
+   scrolling scoped here (rather than the whole page) means the sticky
+   clue card below has a well-defined scroll container to stick within,
+   and it naturally resizes along with `.puzzle-screen` as the keyboard
+   opens/closes. */
+.puzzle-scroll-area {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 10px 16px;
 }
 
 .puzzle-container {
@@ -400,12 +419,12 @@
   border-radius: 20px;
   box-shadow: var(--shadow-welcome-card);
   padding: 10px;
+  flex-shrink: 0;
 }
 
 @media (min-width: 480px) {
-  .puzzle-screen {
-    padding-left: 24px;
-    padding-right: 24px;
+  .puzzle-scroll-area {
+    padding: 24px 24px 16px;
   }
 
   .puzzle-container {
