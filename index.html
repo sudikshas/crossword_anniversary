@@ -3,9 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- `viewport-fit=cover` lets content extend into the safe areas on
+         notched/Dynamic-Island iPhones, which is what makes the
+         `env(safe-area-inset-bottom)` used by the clue card actually
+         return a real value instead of always falling back to 0. -->
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>anniversary_crossword</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

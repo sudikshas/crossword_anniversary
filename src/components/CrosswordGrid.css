@@ -65,13 +65,34 @@
   outline: none;
   text-align: center;
   font: inherit;
-  font-size: clamp(10px, 3.1vw, 16px);
+  /* iOS Safari auto-zooms the whole page when a focused input's
+     computed font-size is under 16px - which our cells, being much
+     smaller than that, would otherwise always be. Keeping this at a
+     fixed 16px (never smaller) stops that zoom outright. The visible
+     glyph is then scaled back down below to actually fit the tiny cell -
+     `transform` is purely a paint-time effect, so Safari's zoom check
+     (which looks at the underlying font-size, not the rendered size)
+     isn't fooled by it. */
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-cell-text);
   text-transform: uppercase;
   caret-color: transparent;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transform: scale(0.62);
+}
+
+@media (min-width: 360px) {
+  .grid-cell-input {
+    transform: scale(0.72);
+  }
+}
+
+@media (min-width: 415px) {
+  .grid-cell-input {
+    transform: scale(0.83);
+  }
 }
 
 .grid-cell--incorrect .grid-cell-input {

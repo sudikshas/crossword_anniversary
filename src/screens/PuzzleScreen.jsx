@@ -67,11 +67,19 @@ function PuzzleScreen({ onComplete }) {
   // final position rather than a mid-animation one.
   useEffect(() => {
     if (!selection) return
-    const element = inputRefs.current.get(cellKey(selection.row, selection.col))
-    if (!element) return
+    const cellElement = inputRefs.current.get(cellKey(selection.row, selection.col))
+    if (!cellElement) return
 
     const timeoutId = setTimeout(() => {
-      element.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      cellElement.scrollIntoView({ block: 'center', behavior: 'smooth' })
+
+      // While the keyboard is closed, the clue card sits in normal flow
+      // right below the grid rather than floating - if the selected cell
+      // is near the top of a tall grid, centering just the cell could
+      // still leave the card below the fold. `block: 'nearest'` nudges
+      // just enough extra to bring it fully into view too, without
+      // fighting the cell's own scroll position above.
+      clueCardRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
     }, 320)
 
     return () => clearTimeout(timeoutId)
