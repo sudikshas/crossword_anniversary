@@ -8,6 +8,7 @@ import {
   cellKey,
   getWordCells,
 } from '../utils/wordIndex'
+import { useKeyboardInset } from '../utils/useKeyboardInset'
 import CrosswordGrid from '../components/CrosswordGrid'
 import ClueCard from '../components/ClueCard'
 
@@ -21,8 +22,11 @@ function PuzzleScreen({ onComplete }) {
 
   const [selection, setSelection] = useState(null)
   const [cellEntries, setCellEntries] = useState({})
+  const [clueCardHeight, setClueCardHeight] = useState(0)
 
   const hasCompletedRef = useRef(false)
+  const clueCardRef = useRef(null)
+  const keyboardInset = useKeyboardInset()
 
   const activeWord = selection
     ? cellIndex.get(cellKey(selection.row, selection.col))?.[selection.direction]
@@ -38,12 +42,29 @@ function PuzzleScreen({ onComplete }) {
     [activeWordCells]
   )
 
+  // Measure the clue card's real height so the grid's reserved bottom
+  // space can match it exactly, instead of guessing a worst-case value.
+  useEffect(() => {
+    const element = clueCardRef.current
+    if (!element) {
+      setClueCardHeight(0)
+      return
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const height = entries[0]?.contentRect.height
+      if (height != null) setClueCardHeight(height)
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [activeWord])
+
   // Whenever the selected cell changes (tap, auto-advance, or backspace
-  // navigation), bring it into a comfortable spot within the scroll area.
-  // The delay gives the mobile keyboard time to finish animating in/out
-  // (which resizes `.puzzle-scroll-area` via `100dvh`) before we measure
-  // where "centered" actually is - scrolling immediately can land in the
-  // wrong spot mid-animation.
+  // navigation) - or the keyboard finishes opening/closing while a cell
+  // is already selected - bring that cell into a comfortable, visible
+  // spot. The delay lets the keyboard animation (and the resulting
+  // `keyboardInset` update) settle first, so we're scrolling against its
+  // final position rather than a mid-animation one.
   useEffect(() => {
     if (!selection) return
     const element = inputRefs.current.get(cellKey(selection.row, selection.col))
@@ -54,7 +75,7 @@ function PuzzleScreen({ onComplete }) {
     }, 320)
 
     return () => clearTimeout(timeoutId)
-  }, [selection?.row, selection?.col])
+  }, [selection?.row, selection?.col, keyboardInset])
 
   const solvedWordIds = useMemo(() => {
     const solved = new Set()
@@ -221,24 +242,48 @@ function PuzzleScreen({ onComplete }) {
     }
   }
 
+  // A small threshold (rather than `keyboardInset > 0`) avoids the card
+  // flickering between modes from tiny, meaningless fluctuations in
+  // `visualViewport.height` (e.g. Safari's UI chrome nudging by a couple
+  // of pixels) that aren't an actual keyboard.
+  const isKeyboardOpen = keyboardInset > 40
+
+  // While the keyboard is open, the card detaches from the page and
+  // floats `keyboardInset` pixels above the true bottom of the screen so
+  // it's never covered by it. The grid's reserved bottom space then
+  // matches the card's real height plus that same inset, so scrolling to
+  // the very bottom of the page never hides the grid's last row behind
+  // the card or the keyboard. The rest of the time, the card just sits in
+  // normal flow directly below the grid, so there's no dead gap.
+  const reservedBottomSpace = activeWord && isKeyboardOpen
+    ? (clueCardHeight || 150) + keyboardInset + 24
+    : 24
+
   return (
-    <div className="screen puzzle-screen">
-      <div className="puzzle-scroll-area">
-        <div className="puzzle-container">
-          <CrosswordGrid
-            grid={grid}
-            selectedCell={selection}
-            activeWordCellKeys={activeWordCellKeys}
-            cellEntries={cellEntries}
-            onCellSelect={handleCellSelect}
-            onGridKeyDown={handleGridKeyDown}
-            registerInputRef={registerInputRef}
-          />
-        </div>
-        {activeWord && (
-          <ClueCard word={activeWord} direction={selection.direction} />
-        )}
+    <div
+      className="screen puzzle-screen"
+      style={{ paddingBottom: `${reservedBottomSpace}px` }}
+    >
+      <div className="puzzle-container">
+        <CrosswordGrid
+          grid={grid}
+          selectedCell={selection}
+          activeWordCellKeys={activeWordCellKeys}
+          cellEntries={cellEntries}
+          onCellSelect={handleCellSelect}
+          onGridKeyDown={handleGridKeyDown}
+          registerInputRef={registerInputRef}
+        />
       </div>
+      {activeWord && (
+        <ClueCard
+          word={activeWord}
+          direction={selection.direction}
+          cardRef={clueCardRef}
+          floating={isKeyboardOpen}
+          style={isKeyboardOpen ? { bottom: `${keyboardInset}px` } : undefined}
+        />
+      )}
     </div>
   )
 }

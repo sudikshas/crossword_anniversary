@@ -1,23 +1,16 @@
 .clue-card {
-  /* Sticky (scoped to the `.puzzle-scroll-area` scroll container) instead
-     of `position: fixed` to the page/viewport - `fixed` elements are
-     positioned against the layout viewport, which on iOS Safari doesn't
-     shrink when the keyboard opens, so a fixed bottom-0 card can end up
-     rendered *behind* the keyboard. A sticky element inside a normal
-     scrolling container stays correctly anchored to the bottom of
-     whatever area is actually visible. */
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  /* Default: normal document flow, sitting naturally right below the
+     grid. No keyboard is open in this state, so there's no need to pin
+     it anywhere - doing so would leave a dead gap between the grid and
+     the card whenever the grid is shorter than the screen. */
+  position: static;
   width: 100%;
   max-width: 480px;
-  margin-top: 14px;
-  flex-shrink: 0;
+  margin: 14px auto 0;
   background: #ffffff;
   border: 1px solid rgba(143, 168, 137, 0.22);
   border-radius: 16px;
-  box-shadow: 0 -6px 20px -10px rgba(55, 89, 85, 0.22);
+  box-shadow: 0 10px 24px -14px rgba(55, 89, 85, 0.22);
   padding: 14px 18px calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
   font-family: var(--font-body-modern);
@@ -27,6 +20,24 @@
   max-height: 42vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Only applied while the on-screen keyboard is actually open (see
+   `isKeyboardOpen` in PuzzleScreen.jsx, driven by the Visual Viewport
+   API) - detaches the card from the page flow and pins it just above
+   the keyboard instead, since it would otherwise end up covered by it. */
+.clue-card--floating {
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  /* Real value set inline via JS (`style={{ bottom }}`) once the exact
+     keyboard height is known - this default just keeps things sane for
+     the very first paint before that measurement lands. */
+  bottom: 0;
+  /* Smooths out the card's position catching up as the keyboard
+     animates open/closed, instead of it snapping abruptly. */
+  transition: bottom 0.15s ease-out;
 }
 
 .clue-card-header {
