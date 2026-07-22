@@ -276,7 +276,17 @@
 .memory-photo::before {
   content: '';
   position: absolute;
-  top: -8px;
+  /* Kept fully inside the card's own box (a small positive offset,
+     never a negative one) so the tape is structurally part of the card
+     it belongs to. A negative `top` here used to let the tape overflow
+     above the card into the gap between gallery items - on iOS Safari,
+     scrolling a CSS multi-column layout can repaint that kind of
+     overflowing absolute pseudo-element separately from its card,
+     which is what made the tape briefly appear as its own floating
+     strip. Sitting inside the card means there's nothing left to
+     detach: the tape can only ever scroll and paint together with the
+     photo underneath it. */
+  top: 2px;
   left: 50%;
   width: 44px;
   height: 15px;
